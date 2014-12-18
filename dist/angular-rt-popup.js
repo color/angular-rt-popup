@@ -5,7 +5,6 @@ angular.module('rt.popup', [])
 
         // Padding towards edges of screen.
         var padding = 10;
-
         function loseFocus(e) {
             if (openedPopup && !$.contains(openedPopup.el[0], e.target)) {
                 hidePopup();
@@ -22,8 +21,14 @@ angular.module('rt.popup', [])
 
             $timeout(function () {
                 $parse(popup.options.popupHidden)(popup.scope);
-
-                popup.el.hide().remove();
+                popup.el.removeClass(popup.options.popupShowClass);
+                if (popup.options.popupCloseTimeout) {
+                    $timeout(function () {
+                        popup.el.hide().remove();
+                    }, popup.options.popupCloseTimeout);
+                } else {
+                    popup.el.hide().remove();
+                }
                 $document.off('click', loseFocus);
             });
         }
@@ -42,6 +47,9 @@ angular.module('rt.popup', [])
                 popupClass: '',
                 popupShown: '',
                 popupHidden: '',
+                popupShowClass: 'js--active',
+                popupCloseTimeout: 350,
+                popupArrowYOffset: 30,
                 popupOverlap: 5 // Overlap with anchor element
             });
 
@@ -74,6 +82,7 @@ angular.module('rt.popup', [])
 
             var maxHeight = $window.innerHeight - 2 * padding;
 
+            var arrowYOffset = options.popupArrowYOffset;
             var overlap = options.popupOverlap;
 
             // Calculate popup position
@@ -147,6 +156,40 @@ angular.module('rt.popup', [])
                 arrowPosition = {
                     left: anchorPoint.left - popupPosition.left
                 };
+            } else if (placement === 'top-right') {
+                anchorPoint = {
+                    top: anchorGeom.top + anchorGeom.height / 2,
+                    left: anchorGeom.left + anchorGeom.width - overlap
+                };
+
+                popupPosition = {
+                    top: anchorPoint.top - arrowYOffset,
+                    left: anchorPoint.left
+                };
+
+                // Clamp for edge of screen
+                popupPosition.top = Math.max(padding, popupPosition.top);
+
+                arrowPosition = {
+                    top: anchorPoint.top - popupPosition.top
+                };
+            } else if (placement === 'top-left') {
+                anchorPoint = {
+                    top: anchorGeom.top + anchorGeom.height / 2,
+                    left: anchorGeom.left + overlap - 2
+                };
+
+                popupPosition = {
+                    top: anchorPoint.top - arrowYOffset,
+                    left: anchorPoint.left - element.width()
+                };
+
+                // Clamp for edge of screen
+                popupPosition.top = Math.max(padding, popupPosition.top);
+
+                arrowPosition = {
+                    top: anchorPoint.top - popupPosition.top
+                };
             } else {
                 throw new Error('Unsupported placement ' + placement);
             }
@@ -177,6 +220,7 @@ angular.module('rt.popup', [])
             }
 
             element.removeClass('hide');
+            element.addClass(options.popupShowClass);
 
             $document.on('click', loseFocus);
 
@@ -212,20 +256,18 @@ angular.module('rt.popup', [])
         };
     }])
 
-    .directive('popupShow', ["Popup", "$parse", "$timeout", function (Popup, $parse, $timeout) {
+    .directive('popupShow', ["Popup", "$parse", function (Popup, $parse) {
         return {
             restrict: 'A',
             scope: true,
             link: function (scope, element, attrs) {
-                element.click(function () {
-                    $timeout(function () {
-                        Popup.close();
-
-                        var shouldShow = $parse(attrs.popupIf || 'true');
-                        if (shouldShow(scope)) {
-                            Popup.show(element, scope, attrs);
-                        }
-                    });
+                element.bind('click', function (e) {
+                    e.stopPropagation();
+                    Popup.close();
+                    var shouldShow = $parse(attrs.popupIf || 'true');
+                    if (shouldShow(scope)) {
+                        Popup.show(element, scope, attrs);
+                    }
                 });
             }
         };

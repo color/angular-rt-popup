@@ -104,6 +104,33 @@ Will auto show the popup when it evaluates to true.
 ```html
 <a popup-show="popup.html" popup-auto-show="showIt">Show popup!</a>
 ```
+popupShowClass: 'js--active',
+                popupCloseTimeout: 350,
+                popupArrowYOffset: 30,
+                
+### `popup-show-class`
+
+You can control what class gets added when the popup is shown with the `popup-show-class` attribute.
+
+```html
+<a popup-show="popup.html" popup-show-class="js--active">Show popup!</a>
+```
+
+### `popup-close-timeout`
+
+Timeout for when the `.hide()` method is called with `popup-close-timeout` attribute.
+
+```html
+<a popup-show="popup.html" popup-close-timeout="350">Show popup!</a>
+```
+
+### `popup-arrow-y-offset`
+
+Control the y-axis offset of the popup with the `popup-arrow-y-offset` attribute. (Only for `popup-placement` of `top-left` and `top-right`)
+
+```html
+<a popup-show="popup.html" popup-arrow-y-offset="30">Show popup!</a>
+```
 
 ### `popup-overlap`
 

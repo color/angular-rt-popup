@@ -217,8 +217,8 @@ angular.module('rt.popup', [])
             restrict: 'A',
             scope: true,
             link: function (scope, element, attrs) {
-                element.click(function () {
-                    $timeout(function () {
+                element.bind('click', function (e) {
+                    e.stopPropagation();
                         Popup.close();
 
                         var shouldShow = $parse(attrs.popupIf || 'true');

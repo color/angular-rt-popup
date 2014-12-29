@@ -48,8 +48,8 @@ angular.module('rt.popup', [])
                 popupShown: '',
                 popupHidden: '',
                 popupShowClass: 'js--active',
-                popupCloseTimeout: 350,
-                popupArrowYOffset: 30,
+                popupCloseTimeout: 300,
+                popupArrowYOffset: 18,
                 popupOverlap: 5 // Overlap with anchor element
             });
 
@@ -83,7 +83,7 @@ angular.module('rt.popup', [])
             var maxHeight = $window.innerHeight - 2 * padding;
 
             var arrowYOffset = options.popupArrowYOffset;
-            var overlap = options.popupOverlap;
+            var overlap = parseFloat(options.popupOverlap);
 
             // Calculate popup position
             if (placement === 'right') {
@@ -174,10 +174,13 @@ angular.module('rt.popup', [])
                     top: anchorPoint.top - popupPosition.top
                 };
             } else if (placement === 'top-left') {
+                console.log(anchorGeom.width);
+                console.log(overlap);
                 anchorPoint = {
                     top: anchorGeom.top + anchorGeom.height / 2,
                     left: anchorGeom.left + overlap - 2
                 };
+                console.log(anchorPoint.left);
 
                 popupPosition = {
                     top: anchorPoint.top - arrowYOffset,
